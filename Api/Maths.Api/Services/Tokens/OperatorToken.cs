@@ -38,19 +38,14 @@ public class OperatorToken : IToken
     /// <returns></returns>
     public override string ToString()
     {
-        switch (Type)
+        return Type switch
         {
-            case OperatorType.AdditionOperator:
-                return "+";
-            case OperatorType.SubtractionOperator:
-                return "-";
-            case OperatorType.MultiplicationOperator:
-                return "*";
-            case OperatorType.DivisionOperator:
-                return "/";
-            default:
-                return string.Empty;
-        }
+            OperatorType.AdditionOperator => "+",
+            OperatorType.SubtractionOperator => "-",
+            OperatorType.MultiplicationOperator => "*",
+            OperatorType.DivisionOperator => "/",
+            _ => string.Empty
+        };
     }
     
     /// <summary>

@@ -1,4 +1,6 @@
 ﻿using Maths.Api.Services;
+using Maths.Api.Services.Converters;
+using Maths.Api.Services.Evaluators;
 
 namespace Maths.Api;
 
@@ -30,7 +32,10 @@ public class Startup
         
         services.AddSwaggerGen();
 
-        services.AddTransient<IMathsApiService, MathsApiService>();
+        services.AddTransient<IMathsService, MathsService>();
+        services.AddTransient<IStringToTokensConverter, StringToTokensConverter>();
+        services.AddTransient<IPostfixNotationConverter, PostfixNotationConverter>();
+        services.AddTransient<IPostfixExpressionEvaluator, PostfixExpressionEvaluator>();
     }
 
     /// <summary>

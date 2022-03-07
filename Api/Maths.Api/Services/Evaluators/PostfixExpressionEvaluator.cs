@@ -59,8 +59,8 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
         {
             OperatorType.AdditionOperator => firstNumber.Value + secondNumber.Value,
             OperatorType.MultiplicationOperator => firstNumber.Value * secondNumber.Value,
-            OperatorType.SubtractionOperator => firstNumber.Value - secondNumber.Value,
-            OperatorType.DivisionOperator => firstNumber.Value / secondNumber.Value,
+            OperatorType.SubtractionOperator => secondNumber.Value - firstNumber.Value,
+            OperatorType.DivisionOperator => secondNumber.Value / firstNumber.Value , 
             _ => throw new PostfixEvaluationException($"Unhandled operator type {operatorToken.Type}")
         };
     }

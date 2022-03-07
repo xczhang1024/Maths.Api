@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using Maths.Api.Enums;
 
 namespace Maths.Api.Services.Tokens;
 
@@ -23,7 +22,7 @@ public class NumberToken : IToken
     /// <returns></returns>
     public override string ToString()
     {
-        return Value.ToString(CultureInfo.InvariantCulture);
+        return $"{Value}";
     }
 
     /// <summary>
