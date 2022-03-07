@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Maths.Api.Controllers;
 
+/// <summary>
+/// Api controller
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class MathsApiController : ControllerBase

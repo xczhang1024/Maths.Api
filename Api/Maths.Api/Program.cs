@@ -1,7 +1,4 @@
-using Maths.Api;
-using Meter.Readings.Api;
-
-namespace Blog.Api
+namespace Maths.Api
 {
     public class Program
     {

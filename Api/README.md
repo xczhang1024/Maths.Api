@@ -1,0 +1,1 @@
+# Api to calculate result of simple maths input
