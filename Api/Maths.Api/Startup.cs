@@ -33,8 +33,8 @@ public class Startup
         services.AddSwaggerGen();
 
         services.AddTransient<IMathsService, MathsService>();
-        services.AddTransient<IStringToTokensConverter, StringToTokensConverter>();
-        services.AddTransient<IPostfixNotationConverter, PostfixNotationConverter>();
+        services.AddTransient<IStringToInfixExpressionConverter, StringToInfixExpressionConverter>();
+        services.AddTransient<IInfixToPostfixExpressionConverter, InfixToPostfixExpressionConverter>();
         services.AddTransient<IPostfixExpressionEvaluator, PostfixExpressionEvaluator>();
     }
 

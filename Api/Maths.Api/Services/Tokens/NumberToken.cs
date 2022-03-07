@@ -1,9 +1,9 @@
-﻿using System.Globalization;
+﻿using Maths.Api.Exceptions;
 
 namespace Maths.Api.Services.Tokens;
 
 /// <summary>
-/// Represents a number
+/// Token that represents a number
 /// </summary>
 public class NumberToken : IToken
 {
@@ -14,6 +14,23 @@ public class NumberToken : IToken
     public NumberToken(double value)
     {
         Value = value;
+    }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="value"></param>
+    public NumberToken(string value)
+    {
+        if (string.IsNullOrEmpty(value)
+            || string.IsNullOrWhiteSpace(value)
+            || !double.TryParse(value, out var num))
+        {
+            throw new ConvertToInfixExpressionException(
+                $"{value} : is not a number");
+        }
+
+        Value = num;
     }
 
     /// <summary>

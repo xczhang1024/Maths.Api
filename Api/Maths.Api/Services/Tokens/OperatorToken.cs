@@ -1,4 +1,5 @@
 ﻿using Maths.Api.Enums;
+using Maths.Api.Exceptions;
 
 namespace Maths.Api.Services.Tokens;
 
@@ -14,22 +15,17 @@ public class OperatorToken : IToken
     public OperatorToken(OperatorType type)
     {
         Type = type;
+        SetPriority();
+    }
 
-        switch (Type)
-        {
-            case OperatorType.AdditionOperator:
-            case OperatorType.SubtractionOperator:
-                Priority = 1;
-                break;
-            
-            case OperatorType.MultiplicationOperator:
-            case OperatorType.DivisionOperator:
-                Priority = 2;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(
-                    $"Unhandled operator type {Type}");
-        }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="token"></param>
+    public OperatorToken(char token)
+    {
+        SetType(token);
+        SetPriority();
     }
     
     /// <summary>
@@ -47,14 +43,53 @@ public class OperatorToken : IToken
             _ => string.Empty
         };
     }
+
+    /// <summary>
+    /// Set token type
+    /// </summary>
+    /// <param name="token"></param>
+    private void SetType(char token)
+    {
+        Type = token switch
+        {
+            '+' => OperatorType.AdditionOperator,
+            '-' => OperatorType.SubtractionOperator,
+            '*' => OperatorType.MultiplicationOperator,
+            '/' => OperatorType.DivisionOperator,
+            _ => throw new ConvertToInfixExpressionException( $"Unhandled token {token}")
+        };
+    }
+
+    /// <summary>
+    /// Set a value for priority
+    /// Higher values mean higher priority
+    /// </summary>
+    /// <exception cref="ConvertToInfixExpressionException"></exception>
+    private void SetPriority()
+    {
+        switch (Type)
+        {
+            case OperatorType.AdditionOperator:
+            case OperatorType.SubtractionOperator:
+                Priority = 1;
+                break;
+            
+            case OperatorType.MultiplicationOperator:
+            case OperatorType.DivisionOperator:
+                Priority = 2;
+                break;
+            default:
+                throw new ConvertToInfixExpressionException($"Unhandled operator type {Type}");
+        }
+    }
     
     /// <summary>
     /// Token type
     /// </summary>
-    public OperatorType Type { get; }
+    public OperatorType Type { get; private set; }
     
     /// <summary>
     /// Priority of operator
     /// </summary>
-    public int Priority { get; }
+    public int Priority { get; private set; }
 }

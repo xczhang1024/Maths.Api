@@ -1,4 +1,5 @@
 ﻿using Maths.Api.DataAccess;
+using Maths.Api.Exceptions;
 using Maths.Api.Services.Converters;
 using Maths.Api.Services.Evaluators;
 using Microsoft.AspNetCore.Mvc;
@@ -6,19 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 namespace Maths.Api.Services;
 
 /// <summary>
-/// Maths Api service
+/// Service for Maths controller
 /// </summary>
 public class MathsService : IMathsService
 {
     /// <summary>
-    /// String to tokens converter
+    /// Convert string to infix expression
     /// </summary>
-    private readonly IStringToTokensConverter _stringToTokensConverter;
+    private readonly IStringToInfixExpressionConverter _stringToInfixExpressionConverter;
 
     /// <summary>
-    /// Convert tokens from infix to postfix notation
+    /// Convert infix expression to postfix expression
     /// </summary>
-    private readonly IPostfixNotationConverter _postfixNotationConverter;
+    private readonly IInfixToPostfixExpressionConverter _infixToPostfixExpressionConverter;
 
     /// <summary>
     /// Evaluate the result of postfix expression
@@ -28,15 +29,15 @@ public class MathsService : IMathsService
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="stringToTokensConverter"></param>
-    /// <param name="postfixNotationConverter"></param>
+    /// <param name="stringToInfixExpressionConverter"></param>
+    /// <param name="infixToPostfixExpressionConverter"></param>
     /// <param name="postfixExpressionEvaluator"></param>
-    public MathsService(IStringToTokensConverter stringToTokensConverter, 
-        IPostfixNotationConverter postfixNotationConverter, 
+    public MathsService(IStringToInfixExpressionConverter stringToInfixExpressionConverter, 
+        IInfixToPostfixExpressionConverter infixToPostfixExpressionConverter, 
         IPostfixExpressionEvaluator postfixExpressionEvaluator)
     {
-        _stringToTokensConverter = stringToTokensConverter;
-        _postfixNotationConverter = postfixNotationConverter;
+        _stringToInfixExpressionConverter = stringToInfixExpressionConverter;
+        _infixToPostfixExpressionConverter = infixToPostfixExpressionConverter;
         _postfixExpressionEvaluator = postfixExpressionEvaluator;
     }
 
@@ -45,8 +46,30 @@ public class MathsService : IMathsService
     /// </summary>
     /// <param name="expressionDto"></param>
     /// <returns></returns>
-    public async Task<IActionResult> EvaluateExpression(InputExpressionDto expressionDto)
+    public IActionResult EvaluateExpression(InputExpressionDto expressionDto)
     {
-        return new OkObjectResult(new ResultDto(5));
+        try
+        {
+            var infixExpression = _stringToInfixExpressionConverter.ConvertToInfixExpression(expressionDto);
+            var postfixExpression = _infixToPostfixExpressionConverter.ConvertToPostfixExpression(infixExpression);
+            var result = _postfixExpressionEvaluator.Evaluate(postfixExpression);
+
+            return new OkObjectResult(new SuccessDto(result));
+        }
+        catch (Exception ex)
+        {
+            if (ex is ConvertToInfixExpressionException 
+                or ConvertToPostfixExpressionException 
+                or PostfixExpressionEvaluationException)
+            {
+                return new UnprocessableEntityObjectResult(
+                    new ErrorDto("The expression is invalid. Reason: " + ex.Message, 
+                        ex.Message));
+            }
+            
+            return new BadRequestObjectResult(
+                new ErrorDto("An error occurred while evaluating the expression", 
+                ex.Message));
+        }
     }
 }

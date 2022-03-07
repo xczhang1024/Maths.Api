@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Maths.Api.Services;
 
 /// <summary>
-/// Maths Api service
+/// Service for Maths controller
 /// </summary>
 public interface IMathsService
 {
@@ -13,5 +13,5 @@ public interface IMathsService
     /// </summary>
     /// <param name="expressionDto"></param>
     /// <returns></returns>
-    Task<IActionResult> EvaluateExpression(InputExpressionDto expressionDto);
+    IActionResult EvaluateExpression(InputExpressionDto expressionDto);
 }

@@ -19,10 +19,10 @@ public class ErrorDto
     /// <summary>
     /// Error message
     /// </summary>
-    public string Message { get; set; }
+    public string Message { get; }
     
     /// <summary>
     /// Exception message
     /// </summary>
-    public string ExceptionMessage { get; set; }
+    public string ExceptionMessage { get; }
 }

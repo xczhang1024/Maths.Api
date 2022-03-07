@@ -1,15 +1,15 @@
 ﻿namespace Maths.Api.DataAccess;
 
 /// <summary>
-/// Represents an output from Api
+/// Represents successful output from Api
 /// </summary>
-public class ResultDto
+public class SuccessDto
 {
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="result"></param>
-    public ResultDto(double result)
+    public SuccessDto(double result)
     {
         Result = result;
     }

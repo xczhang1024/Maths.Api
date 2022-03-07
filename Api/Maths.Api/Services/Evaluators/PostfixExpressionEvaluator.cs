@@ -1,5 +1,6 @@
 ﻿using Maths.Api.Enums;
 using Maths.Api.Exceptions;
+using Maths.Api.Services.Expressions;
 using Maths.Api.Services.Tokens;
 
 namespace Maths.Api.Services.Evaluators;
@@ -26,7 +27,7 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
                     evaluatedTokens.Push(numberToken);
                     break;
                 case OperatorToken when evaluatedTokens.Count < 2:
-                    throw new PostfixEvaluationException(
+                    throw new PostfixExpressionEvaluationException(
                         $"Failed to evaluate expression {postFixExpression}");
                 case OperatorToken operatorToken:
                     var firstNumber = evaluatedTokens.Pop();
@@ -38,7 +39,7 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
 
         if (evaluatedTokens.Count != 1)
         {
-            throw new PostfixEvaluationException(
+            throw new PostfixExpressionEvaluationException(
                 $"Failed to evaluate expression {postFixExpression}");
         }
 
@@ -52,7 +53,7 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
     /// <param name="firstNumber"></param>
     /// <param name="secondNumber"></param>
     /// <returns></returns>
-    /// <exception cref="PostfixEvaluationException"></exception>
+    /// <exception cref="PostfixExpressionEvaluationException"></exception>
     private static double Evaluate(OperatorToken operatorToken, NumberToken firstNumber, NumberToken secondNumber)
     {
         return operatorToken.Type switch
@@ -61,7 +62,7 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
             OperatorType.MultiplicationOperator => firstNumber.Value * secondNumber.Value,
             OperatorType.SubtractionOperator => secondNumber.Value - firstNumber.Value,
             OperatorType.DivisionOperator => secondNumber.Value / firstNumber.Value , 
-            _ => throw new PostfixEvaluationException($"Unhandled operator type {operatorToken.Type}")
+            _ => throw new PostfixExpressionEvaluationException($"Operator type: {operatorToken.Type} is unknown")
         };
     }
 }
