@@ -11,34 +11,19 @@ namespace Maths.Api.Services;
 /// </summary>
 public class MathsService : IMathsService
 {
-    /// <summary>
-    /// Convert string to infix expression
-    /// </summary>
-    private readonly IStringToInfixExpressionConverter _stringToInfixExpressionConverter;
+    private readonly IConverterRunner _converterRunner;
 
-    /// <summary>
-    /// Convert infix expression to postfix expression
-    /// </summary>
-    private readonly IInfixToPostfixExpressionConverter _infixToPostfixExpressionConverter;
-
-    /// <summary>
-    /// Evaluate the result of postfix expression
-    /// </summary>
-    private readonly IPostfixExpressionEvaluator _postfixExpressionEvaluator;
+    private readonly IEvaluator _evaluator;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="stringToInfixExpressionConverter"></param>
-    /// <param name="infixToPostfixExpressionConverter"></param>
-    /// <param name="postfixExpressionEvaluator"></param>
-    public MathsService(IStringToInfixExpressionConverter stringToInfixExpressionConverter, 
-        IInfixToPostfixExpressionConverter infixToPostfixExpressionConverter, 
-        IPostfixExpressionEvaluator postfixExpressionEvaluator)
+    /// <param name="converterRunner"></param>
+    /// <param name="evaluator"></param>
+    public MathsService(IConverterRunner converterRunner, IEvaluator evaluator)
     {
-        _stringToInfixExpressionConverter = stringToInfixExpressionConverter;
-        _infixToPostfixExpressionConverter = infixToPostfixExpressionConverter;
-        _postfixExpressionEvaluator = postfixExpressionEvaluator;
+        _evaluator = evaluator;
+        _converterRunner = converterRunner;
     }
 
     /// <summary>
@@ -50,25 +35,23 @@ public class MathsService : IMathsService
     {
         try
         {
-            var infixExpression = _stringToInfixExpressionConverter.ConvertToInfixExpression(expressionDto);
-            var postfixExpression = _infixToPostfixExpressionConverter.ConvertToPostfixExpression(infixExpression);
-            var result = _postfixExpressionEvaluator.Evaluate(postfixExpression);
+            var expression = _converterRunner.RunConverters(expressionDto.Expression);
+            var result = _evaluator.Evaluate(expression);
 
             return new OkObjectResult(new SuccessDto(result));
         }
         catch (Exception ex)
         {
-            if (ex is ConvertToInfixExpressionException 
-                or ConvertToPostfixExpressionException 
-                or PostfixExpressionEvaluationException)
+            if (ex is ConversionException 
+                or EvaluationException)
             {
                 return new UnprocessableEntityObjectResult(
-                    new ErrorDto("The expression is invalid. Reason: " + ex.Message, 
+                    new ErrorDto("The input is invalid. Reason: " + ex.Message, 
                         ex.Message));
             }
             
             return new BadRequestObjectResult(
-                new ErrorDto("An error occurred while evaluating the expression", 
+                new ErrorDto("An error occurred while evaluating the input", 
                 ex.Message));
         }
     }

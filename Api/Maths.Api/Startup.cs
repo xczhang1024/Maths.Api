@@ -32,10 +32,13 @@ public class Startup
         
         services.AddSwaggerGen();
 
+        services.AddTransient<IConvertFromString, ConvertStringToExpression>();
+        services.AddTransient<IConvertFromExpression, ConvertInfixToPostfixExpression>();
+        services.AddTransient<IConverterRunner, ConverterRunner>();
+        
+        services.AddTransient<IEvaluator, EvaluatePostfixExpression>();
+
         services.AddTransient<IMathsService, MathsService>();
-        services.AddTransient<IStringToInfixExpressionConverter, StringToInfixExpressionConverter>();
-        services.AddTransient<IInfixToPostfixExpressionConverter, InfixToPostfixExpressionConverter>();
-        services.AddTransient<IPostfixExpressionEvaluator, PostfixExpressionEvaluator>();
     }
 
     /// <summary>

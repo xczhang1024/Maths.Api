@@ -1,20 +1,23 @@
 ﻿using System.Text;
+using Maths.Api.Enums;
 using Maths.Api.Services.Tokens;
 
 namespace Maths.Api.Services.Expressions;
 
 /// <summary>
-/// Holds an infix expression
+/// Represents an expression
 /// </summary>
-public class InfixExpression
+public class Expression
 {
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="tokens"></param>
-    public InfixExpression(List<IToken> tokens)
+    /// <param name="type"></param>
+    public Expression(List<IToken> tokens, ExpressionType type)
     {
         Tokens = tokens;
+        Type = type;
     }
     
     /// <summary>
@@ -37,4 +40,9 @@ public class InfixExpression
     /// Tokens
     /// </summary>
     public List<IToken> Tokens { get; }
+    
+    /// <summary>
+    /// Expression type
+    /// </summary>
+    public ExpressionType Type { get; }
 }

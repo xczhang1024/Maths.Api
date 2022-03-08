@@ -48,6 +48,7 @@ public class OperatorToken : IToken
     /// Set token type
     /// </summary>
     /// <param name="token"></param>
+    /// <exception cref="ConversionException"></exception>
     private void SetType(char token)
     {
         Type = token switch
@@ -56,7 +57,8 @@ public class OperatorToken : IToken
             '-' => OperatorType.SubtractionOperator,
             '*' => OperatorType.MultiplicationOperator,
             '/' => OperatorType.DivisionOperator,
-            _ => throw new ConvertToInfixExpressionException( $"Unhandled token {token}")
+            _ => throw new ConversionException( 
+                $"Failed to convert to expression: unhandled token: {token}")
         };
     }
 
@@ -64,7 +66,7 @@ public class OperatorToken : IToken
     /// Set a value for priority
     /// Higher values mean higher priority
     /// </summary>
-    /// <exception cref="ConvertToInfixExpressionException"></exception>
+    /// <exception cref="ConversionException"></exception>
     private void SetPriority()
     {
         switch (Type)
@@ -79,7 +81,8 @@ public class OperatorToken : IToken
                 Priority = 2;
                 break;
             default:
-                throw new ConvertToInfixExpressionException($"Unhandled operator type {Type}");
+                throw new ConversionException(
+                    $"Failed to convert to expression: unhandled operator type: {Type}");
         }
     }
     

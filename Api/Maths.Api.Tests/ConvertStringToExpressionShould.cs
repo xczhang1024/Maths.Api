@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Maths.Api.DataAccess;
+using Maths.Api.Enums;
 using Maths.Api.Exceptions;
 using Maths.Api.Services.Converters;
 using Maths.Api.Services.Expressions;
@@ -8,49 +9,51 @@ using Xunit;
 
 namespace Maths.Api.Tests;
 
-public class StringToInfixExpressionConverterShould
+public class ConvertStringToExpressionShould
 {
     [Fact]
     public void CorrectlyConvertThreePlusFourToInfixExpression()
     {
         var threePlusFourExpression = new InputExpressionDto("3+4");
-        var infixExpression = new InfixExpression(new List<IToken>()
+        var infixExpression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new OperatorToken('+'),
             new NumberToken(4)
-        });
+        }, ExpressionType.Infix);
 
-        var sut = new StringToInfixExpressionConverter();
-        var expression = sut.ConvertToInfixExpression(threePlusFourExpression);
+        var sut = new ConvertStringToExpression();
+        var expression = sut.Convert(threePlusFourExpression.Expression);
         
         Assert.Equal(infixExpression.ToString(), expression.ToString());
+        Assert.Equal(ExpressionType.Infix, expression.Type);
     }
 
     [Fact]
     public void CorrectlyConvertThreePlusFourDivideByTwoToInfixExpression()
     {
         var threePlusFourDivideByTwoExpression = new InputExpressionDto("3 + 4 / 2");
-        var infixExpression = new InfixExpression(new List<IToken>()
+        var infixExpression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new OperatorToken('+'),
             new NumberToken(4),
             new OperatorToken('/'),
             new NumberToken(2)
-        });
+        }, ExpressionType.Infix);
         
-        var sut = new StringToInfixExpressionConverter();
-        var expression = sut.ConvertToInfixExpression(threePlusFourDivideByTwoExpression);
+        var sut = new ConvertStringToExpression();
+        var expression = sut.Convert(threePlusFourDivideByTwoExpression.Expression);
         
         Assert.Equal(infixExpression.ToString(), expression.ToString());
+        Assert.Equal(ExpressionType.Infix, expression.Type);
     }
 
     [Fact]
     public void CorrectlyConvertThreePlusFourTimesTwoMinusFiveDivideByThreeToInfixExpression()
     {
         var threePlusFourTimesTwoMinusFiveDividedByThreeExpression = new InputExpressionDto("3 + 4* 2- 5/3");
-        var infixExpression = new InfixExpression(new List<IToken>()
+        var infixExpression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new OperatorToken('+'),
@@ -61,12 +64,13 @@ public class StringToInfixExpressionConverterShould
             new NumberToken(5),
             new OperatorToken('/'),
             new NumberToken(3)
-        });
+        }, ExpressionType.Infix);
         
-        var sut = new StringToInfixExpressionConverter();
-        var expression = sut.ConvertToInfixExpression(threePlusFourTimesTwoMinusFiveDividedByThreeExpression);
+        var sut = new ConvertStringToExpression();
+        var expression = sut.Convert(threePlusFourTimesTwoMinusFiveDividedByThreeExpression.Expression);
         
         Assert.Equal(infixExpression.ToString(), expression.ToString());
+        Assert.Equal(ExpressionType.Infix, expression.Type);
     }
     
     [Fact]
@@ -74,13 +78,15 @@ public class StringToInfixExpressionConverterShould
     {
         var startsWithOperatorExpression = new InputExpressionDto("+3+7");
         
-        var sut = new StringToInfixExpressionConverter();
+        var sut = new ConvertStringToExpression();
         
         var ex = Assert
-            .Throws<ConvertToInfixExpressionException>(()
-                => sut.ConvertToInfixExpression(startsWithOperatorExpression));
+            .Throws<ConversionException>(()
+                => sut.Convert(startsWithOperatorExpression.Expression));
         
-        Assert.Equal("Expression should not begin or end with an operator: +-*/", ex.Message);
+        Assert.Equal(
+            "Failed to convert expression: the input should not begin or end with an operator: +-*/", 
+            ex.Message);
     }
     
     [Fact]
@@ -88,13 +94,15 @@ public class StringToInfixExpressionConverterShould
     {
         var endsWithOperatorExpression = new InputExpressionDto("3+7/");
         
-        var sut = new StringToInfixExpressionConverter();
+        var sut = new ConvertStringToExpression();
         
         var ex = Assert
-            .Throws<ConvertToInfixExpressionException>(()
-                => sut.ConvertToInfixExpression(endsWithOperatorExpression));
+            .Throws<ConversionException>(()
+                => sut.Convert(endsWithOperatorExpression.Expression));
         
-        Assert.Equal("Expression should not begin or end with an operator: +-*/", ex.Message);
+        Assert.Equal(
+            "Failed to convert expression: the input should not begin or end with an operator: +-*/", 
+            ex.Message);
     }
     
     [Fact]
@@ -102,13 +110,15 @@ public class StringToInfixExpressionConverterShould
     {
         var tooShortExpression = new InputExpressionDto("4+");
         
-        var sut = new StringToInfixExpressionConverter();
+        var sut = new ConvertStringToExpression();
         
         var ex = Assert
-            .Throws<ConvertToInfixExpressionException>(()
-                => sut.ConvertToInfixExpression(tooShortExpression));
+            .Throws<ConversionException>(()
+                => sut.Convert(tooShortExpression.Expression));
         
-        Assert.Equal("Expression should at least be 3 characters long", ex.Message);
+        Assert.Equal(
+            "Failed to convert expression: the input should be at least 3 characters long", 
+            ex.Message);
     }
     
     [Fact]
@@ -116,12 +126,14 @@ public class StringToInfixExpressionConverterShould
     {
         var whitespaceExpression = new InputExpressionDto("  \r\n");
         
-        var sut = new StringToInfixExpressionConverter();
+        var sut = new ConvertStringToExpression();
         
         var ex = Assert
-            .Throws<ConvertToInfixExpressionException>(()
-                => sut.ConvertToInfixExpression(whitespaceExpression));
+            .Throws<ConversionException>(()
+                => sut.Convert(whitespaceExpression.Expression));
         
-        Assert.Equal("Expression should not be empty", ex.Message);
+        Assert.Equal(
+            "Failed to convert expression: the input is empty", 
+            ex.Message);
     }
 }

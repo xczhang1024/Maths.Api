@@ -1,4 +1,5 @@
-﻿using Maths.Api.Exceptions;
+﻿using Maths.Api.Enums;
+using Maths.Api.Exceptions;
 using Maths.Api.Services.Expressions;
 using Maths.Api.Services.Tokens;
 
@@ -7,25 +8,32 @@ namespace Maths.Api.Services.Converters;
 /// <summary>
 /// Convert infix expression to postfix expression
 /// </summary>
-public class InfixToPostfixExpressionConverter : IInfixToPostfixExpressionConverter
+public class ConvertInfixToPostfixExpression : IConvertFromExpression
 {
     /// <summary>
     /// Convert infix expression to postfix expression
     /// </summary>
-    /// <param name="infixExpression"></param>
+    /// <param name="expression"></param>
     /// <returns></returns>
-    /// <exception cref="ConvertToPostfixExpressionException"></exception>
-    public PostfixExpression ConvertToPostfixExpression(InfixExpression infixExpression)
+    /// <exception cref="ConversionException"></exception>
+    public Expression Convert(Expression expression)
     {
-        if (infixExpression?.Tokens == null)
+        if (expression?.Tokens == null)
         {
-            throw new ConvertToPostfixExpressionException("The expression was not provided");
+            throw new ConversionException(
+                "Failed to convert expression: the expression was not provided");
+        }
+
+        if (expression.Type != ExpressionType.Infix)
+        {
+            throw new ConversionException(
+                "Failed to convert expression: the expression has incorrect expression type");
         }
         
         var operatorTokens = new Stack<OperatorToken>();
         var result = new List<IToken>();
 
-        foreach (var token in infixExpression.Tokens)
+        foreach (var token in expression.Tokens)
         {
             ProcessToken(token, operatorTokens, result);
         }
@@ -36,7 +44,7 @@ public class InfixToPostfixExpressionConverter : IInfixToPostfixExpressionConver
             result.Add(operatorTokens.Pop());
         }
 
-        return new PostfixExpression(result);
+        return new Expression(result, ExpressionType.Postfix);
     }
 
     /// <summary>
@@ -45,7 +53,7 @@ public class InfixToPostfixExpressionConverter : IInfixToPostfixExpressionConver
     /// <param name="token"></param>
     /// <param name="operatorTokens"></param>
     /// <param name="result"></param>
-    /// <exception cref="ConvertToPostfixExpressionException"></exception>
+    /// <exception cref="ConversionException"></exception>
     private void ProcessToken(IToken token, 
         Stack<OperatorToken> operatorTokens, ICollection<IToken> result)
     {
@@ -58,7 +66,8 @@ public class InfixToPostfixExpressionConverter : IInfixToPostfixExpressionConver
                 StoreOperatorToken(operatorToken, operatorTokens, result);
                 break;
             default:
-                throw new ConvertToPostfixExpressionException($"The character: {token} is unknown");
+                throw new ConversionException(
+                    "Failed to convert expression: found unknown token in expression");
         }
     }
 

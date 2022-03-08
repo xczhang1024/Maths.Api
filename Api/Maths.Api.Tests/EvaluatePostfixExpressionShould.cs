@@ -8,21 +8,21 @@ using Xunit;
 
 namespace Maths.Api.Tests;
 
-public class PostfixExpressionEvaluatorShould
+public class EvaluatePostfixExpressionShould
 {
     [Fact]
     public void CorrectlySolveThreePlusFour()
     {
-        var expression = new PostfixExpression(new List<IToken>()
+        var expression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new NumberToken(4),
             new OperatorToken(OperatorType.AdditionOperator),
-        });
+        }, ExpressionType.Postfix);
 
         const double correctAnswer = 3 + 4;
 
-        var sut = new PostfixExpressionEvaluator();
+        var sut = new EvaluatePostfixExpression();
         var result = sut.Evaluate(expression);
         
         Assert.Equal(correctAnswer, result);
@@ -31,18 +31,18 @@ public class PostfixExpressionEvaluatorShould
     [Fact]
     public void CorrectlySolveThreePlusFourDivideByTwo()
     {
-        var expression = new PostfixExpression(new List<IToken>()
+        var expression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new NumberToken(4),
             new NumberToken(2),
             new OperatorToken(OperatorType.DivisionOperator),
             new OperatorToken(OperatorType.AdditionOperator)
-        });
+        }, ExpressionType.Postfix);
 
         const double correctAnswer = 3 + 4 / 2;
 
-        var sut = new PostfixExpressionEvaluator();
+        var sut = new EvaluatePostfixExpression();
         var result = sut.Evaluate(expression);
         
         Assert.Equal(correctAnswer, result);
@@ -51,7 +51,7 @@ public class PostfixExpressionEvaluatorShould
     [Fact]
     public void CorrectlySolveThreePlusFourTimesTwoMinusFiveDivideByThree()
     {
-        var expression = new PostfixExpression(new List<IToken>()
+        var expression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new NumberToken(4),
@@ -62,11 +62,11 @@ public class PostfixExpressionEvaluatorShould
             new NumberToken(3),
             new OperatorToken(OperatorType.DivisionOperator),
             new OperatorToken(OperatorType.SubtractionOperator)
-        });
+        }, ExpressionType.Postfix);
 
         const double correctAnswer = 3 + 4 * 2 - 5.0d / 3;
         
-        var sut = new PostfixExpressionEvaluator();
+        var sut = new EvaluatePostfixExpression();
         var result = sut.Evaluate(expression);
         
         Assert.Equal(correctAnswer, result);
@@ -75,58 +75,61 @@ public class PostfixExpressionEvaluatorShould
     [Fact]
     public void ThrowsEvaluationExceptionWhenThereAreMoreNumbersThanOperators()
     {
-        var expression = new PostfixExpression(new List<IToken>()
+        var expression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new NumberToken(4),
             new NumberToken(2),
             new OperatorToken(OperatorType.MultiplicationOperator)
-        });
+        }, ExpressionType.Postfix);
         
-        var sut = new PostfixExpressionEvaluator();
+        var sut = new EvaluatePostfixExpression();
 
         var ex = Assert
-            .Throws<PostfixExpressionEvaluationException>(()
+            .Throws<EvaluationException>(()
                 => sut.Evaluate(expression));
         
-        Assert.Equal($"Failed to evaluate expression {expression}", ex.Message);
+        Assert.Equal("Failed to evaluate expression: syntax error", 
+            ex.Message);
     }
 
     [Fact]
     public void ThrowsEvaluationExceptionWithOneNumberAndOneOperator()
     {
-        var expression = new PostfixExpression(new List<IToken>()
+        var expression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new OperatorToken(OperatorType.AdditionOperator)
-        });
+        }, ExpressionType.Postfix);
         
-        var sut = new PostfixExpressionEvaluator();
+        var sut = new EvaluatePostfixExpression();
 
         var ex = Assert
-            .Throws<PostfixExpressionEvaluationException>(()
+            .Throws<EvaluationException>(()
                 => sut.Evaluate(expression));
         
-        Assert.Equal($"Failed to evaluate expression {expression}", ex.Message);
+        Assert.Equal("Failed to evaluate expression: syntax error", 
+            ex.Message);
     }
     
     [Fact]
     public void ThrowsEvaluationExceptionWithTwoOperators()
     {
-        var expression = new PostfixExpression(new List<IToken>()
+        var expression = new Expression(new List<IToken>()
         {
             new NumberToken(3),
             new OperatorToken(OperatorType.AdditionOperator),
             new OperatorToken(OperatorType.SubtractionOperator),
             new NumberToken(5)
-        });
+        }, ExpressionType.Postfix);
         
-        var sut = new PostfixExpressionEvaluator();
+        var sut = new EvaluatePostfixExpression();
 
         var ex = Assert
-            .Throws<PostfixExpressionEvaluationException>(()
+            .Throws<EvaluationException>(()
                 => sut.Evaluate(expression));
         
-        Assert.Equal($"Failed to evaluate expression {expression}", ex.Message);
+        Assert.Equal("Failed to evaluate expression: syntax error", 
+            ex.Message);
     }
 }

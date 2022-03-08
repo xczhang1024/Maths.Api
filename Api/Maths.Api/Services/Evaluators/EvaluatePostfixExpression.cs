@@ -1,4 +1,5 @@
-﻿using Maths.Api.Enums;
+﻿using System.Data;
+using Maths.Api.Enums;
 using Maths.Api.Exceptions;
 using Maths.Api.Services.Expressions;
 using Maths.Api.Services.Tokens;
@@ -6,20 +7,28 @@ using Maths.Api.Services.Tokens;
 namespace Maths.Api.Services.Evaluators;
 
 /// <summary>
-/// Evaluator for postfix expressions
+/// Evaluate postfix expressions
 /// </summary>
-public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
+public class EvaluatePostfixExpression : IEvaluator
 {
     /// <summary>
-    /// Evaluate postfix expression to a double result
+    /// Evaluate expression to a double result
     /// </summary>
-    /// <param name="postFixExpression"></param>
+    /// <param name="expression"></param>
     /// <returns></returns>
-    public double Evaluate(PostfixExpression postFixExpression)
+    /// <exception cref="EvaluationException"></exception>
+    public double Evaluate(Expression expression)
     {
+        if (expression.Type != ExpressionType.Postfix)
+        {
+            throw new EvaluateException(
+                "Failed to evaluate expression: incorrect format"
+            );
+        }
+        
         var evaluatedTokens = new Stack<NumberToken>();
 
-        foreach (var token in postFixExpression.Tokens)
+        foreach (var token in expression.Tokens)
         {
             switch (token)
             {
@@ -27,8 +36,8 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
                     evaluatedTokens.Push(numberToken);
                     break;
                 case OperatorToken when evaluatedTokens.Count < 2:
-                    throw new PostfixExpressionEvaluationException(
-                        $"Failed to evaluate expression {postFixExpression}");
+                    throw new EvaluationException(
+                        "Failed to evaluate expression: syntax error");
                 case OperatorToken operatorToken:
                     var firstNumber = evaluatedTokens.Pop();
                     var secondNumber = evaluatedTokens.Pop();
@@ -39,8 +48,8 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
 
         if (evaluatedTokens.Count != 1)
         {
-            throw new PostfixExpressionEvaluationException(
-                $"Failed to evaluate expression {postFixExpression}");
+            throw new EvaluationException(
+                "Failed to evaluate expression: syntax error");
         }
 
         return evaluatedTokens.Pop().Value;
@@ -53,7 +62,7 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
     /// <param name="firstNumber"></param>
     /// <param name="secondNumber"></param>
     /// <returns></returns>
-    /// <exception cref="PostfixExpressionEvaluationException"></exception>
+    /// <exception cref="EvaluationException"></exception>
     private static double Evaluate(OperatorToken operatorToken, NumberToken firstNumber, NumberToken secondNumber)
     {
         return operatorToken.Type switch
@@ -62,7 +71,7 @@ public class PostfixExpressionEvaluator : IPostfixExpressionEvaluator
             OperatorType.MultiplicationOperator => firstNumber.Value * secondNumber.Value,
             OperatorType.SubtractionOperator => secondNumber.Value - firstNumber.Value,
             OperatorType.DivisionOperator => secondNumber.Value / firstNumber.Value , 
-            _ => throw new PostfixExpressionEvaluationException($"Operator type: {operatorToken.Type} is unknown")
+            _ => throw new EvaluationException("Failed to evaluate expression: unknown operator type")
         };
     }
 }

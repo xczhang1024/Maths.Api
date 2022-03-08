@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Maths.Api.DataAccess;
+using Maths.Api.Enums;
 using Maths.Api.Exceptions;
 using Maths.Api.Services.Expressions;
 using Maths.Api.Services.Tokens;
@@ -9,38 +9,38 @@ namespace Maths.Api.Services.Converters;
 /// <summary>
 /// Convert string to infix expression
 /// </summary>
-public class StringToInfixExpressionConverter : IStringToInfixExpressionConverter
+public class ConvertStringToExpression : IConvertFromString
 {
     /// <summary>
     /// Convert string to infix expression
     /// </summary>
-    /// <param name="inputExpressionDto"></param>
+    /// <param name="expressionString"></param>
     /// <returns></returns>
-    public InfixExpression ConvertToInfixExpression(InputExpressionDto inputExpressionDto)
+    public Expression Convert(string expressionString)
     {
-        var input = inputExpressionDto.Expression;
-
-        if (string.IsNullOrWhiteSpace(input))
+        if (string.IsNullOrWhiteSpace(expressionString))
         {
-            throw new ConvertToInfixExpressionException("Expression should not be empty");
+            throw new ConversionException(
+                "Failed to convert expression: the input is empty");
         }
 
-        if (input.Length < 3)
+        if (expressionString.Length < 3)
         {
-            throw new ConvertToInfixExpressionException(
-                "Expression should at least be 3 characters long");
+            throw new ConversionException(
+                "Failed to convert expression: the input should be at least 3 characters long");
         }
         
-        if(IsOperator(input.First()) || IsOperator(input.Last() ) )
+        if(IsOperator(expressionString.First()) 
+           || IsOperator(expressionString.Last() ) )
         {
-            throw new ConvertToInfixExpressionException(
-                "Expression should not begin or end with an operator: +-*/");
+            throw new ConversionException(
+                "Failed to convert expression: the input should not begin or end with an operator: +-*/");
         }
 
         var tokens = new List<IToken>();
         var numbersBuffer = new StringBuilder();
 
-        foreach (var c in input.Where(c => !char.IsWhiteSpace(c)))
+        foreach (var c in expressionString.Where(c => !char.IsWhiteSpace(c)))
         {
             if (IsOperator(c))
             {
@@ -55,8 +55,9 @@ public class StringToInfixExpressionConverter : IStringToInfixExpressionConverte
                 }
                 else
                 {
-                    throw new ConvertToInfixExpressionException(
-                        "Expression should contain only numbers and +-*/");
+                    throw new ConversionException(
+                        "Failed to convert expression: " +
+                        "the input should contain only numbers and +-*/ characters");
                 }
             }
             else
@@ -68,7 +69,7 @@ public class StringToInfixExpressionConverter : IStringToInfixExpressionConverte
         var remainingNumbers = numbersBuffer.ToString();
         tokens.Add(new NumberToken(remainingNumbers));
 
-        return new InfixExpression(tokens);
+        return new Expression(tokens, ExpressionType.Infix);
     }
 
     /// <summary>
