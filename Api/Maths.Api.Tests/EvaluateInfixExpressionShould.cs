@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using Maths.Api.Enums;
 using Maths.Api.Exceptions;
-using Maths.Api.Services.Converters;
+using Maths.Api.Services.Evaluators;
 using Maths.Api.Services.Expressions;
 using Maths.Api.Services.Tokens;
 using Xunit;
 
 namespace Maths.Api.Tests;
 
-public class ConvertInfixToPostfixExpressionShould
+public class EvaluateInfixExpressionShould
 {
     [Fact]
-    public void ThrowConversionExceptionWhenExpressionIsNotInfix()
+    public void ThrowEvaluationExceptionWhenExpressionIsNotInfix()
     {
         var postFixExpression = new Expression(new List<IToken>()
         {
@@ -20,19 +20,19 @@ public class ConvertInfixToPostfixExpressionShould
             new OperatorToken(OperatorType.AdditionOperator),
         }, ExpressionType.Postfix);
         
-        var sut = new ConvertInfixToPostfixExpression();
+        var sut = new EvaluateInfixExpression();
         
         var ex = Assert
-            .Throws<ConversionException>(()
-                => sut.Convert(postFixExpression));
+            .Throws<EvaluationException>(()
+                => sut.Evaluate(postFixExpression));
         
         Assert.Equal(
-            "Failed to convert expression: the expression has incorrect expression type", 
+            "Failed to evaluate expression: the expression has incorrect expression type", 
             ex.Message);
     }
     
     [Fact]
-    public void CorrectlyConvertThreePlusFourToPostfixNotation()
+    public void CorrectlyEvaluateThreePlusFourToPostfixNotation()
     {
         var infixExpression = new Expression(new List<IToken>()
         {
@@ -41,15 +41,15 @@ public class ConvertInfixToPostfixExpressionShould
             new NumberToken(4)
         }, ExpressionType.Infix);
 
-        var sut = new ConvertInfixToPostfixExpression();
-        var result = sut.Convert(infixExpression);
+        var sut = new EvaluateInfixExpression();
+        var result = sut.Evaluate(infixExpression);
 
         Assert.Equal("3 4 +", result.ToString());
         Assert.Equal(ExpressionType.Postfix, result.Type);
     }
     
     [Fact]
-    public void CorrectlyConvertThreePlusFourDivideByTwoToPostfixNotation()
+    public void CorrectlyEvaluateThreePlusFourDivideByTwoToPostfixNotation()
     {
         var infixExpression = new Expression(new List<IToken>()
         {
@@ -60,15 +60,15 @@ public class ConvertInfixToPostfixExpressionShould
             new NumberToken(2)
         }, ExpressionType.Infix);
         
-        var sut = new ConvertInfixToPostfixExpression();
-        var result = sut.Convert(infixExpression);
+        var sut = new EvaluateInfixExpression();
+        var result = sut.Evaluate(infixExpression);
 
         Assert.Equal("3 4 2 / +", result.ToString());
         Assert.Equal(ExpressionType.Postfix, result.Type);
     }
     
     [Fact]
-    public void CorrectlyConvertThreePlusFourTimesTwoMinusFiveDivideByThreeToPostfixNotation()
+    public void CorrectlyEvaluateThreePlusFourTimesTwoMinusFiveDivideByThreeToPostfixNotation()
     {
         var infixExpression = new Expression(new List<IToken>()
         {
@@ -83,8 +83,8 @@ public class ConvertInfixToPostfixExpressionShould
             new NumberToken(3),
         }, ExpressionType.Infix);
         
-        var sut = new ConvertInfixToPostfixExpression();
-        var result = sut.Convert(infixExpression);
+        var sut = new EvaluateInfixExpression();
+        var result = sut.Evaluate(infixExpression);
 
         Assert.Equal("3 4 2 * + 5 3 / -", result.ToString());
         Assert.Equal(ExpressionType.Postfix, result.Type);

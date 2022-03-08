@@ -17,7 +17,7 @@ public class EvaluatePostfixExpression : IEvaluator
     /// <param name="expression"></param>
     /// <returns></returns>
     /// <exception cref="EvaluationException"></exception>
-    public double Evaluate(Expression expression)
+    public Expression Evaluate(Expression expression)
     {
         if (expression.Type != ExpressionType.Postfix)
         {
@@ -52,7 +52,10 @@ public class EvaluatePostfixExpression : IEvaluator
                 "Failed to evaluate expression: syntax error");
         }
 
-        return evaluatedTokens.Pop().Value;
+        return new Expression(new List<IToken>()
+        {
+            evaluatedTokens.First()
+        }, ExpressionType.SingleNumber);
     }
 
     /// <summary>

@@ -3,31 +3,31 @@ using Maths.Api.Exceptions;
 using Maths.Api.Services.Expressions;
 using Maths.Api.Services.Tokens;
 
-namespace Maths.Api.Services.Converters;
+namespace Maths.Api.Services.Evaluators;
 
 /// <summary>
-/// Convert infix expression to postfix expression
+/// Evaluate infix expression
 /// </summary>
-public class ConvertInfixToPostfixExpression : IConvertFromExpression
+public class EvaluateInfixExpression : IEvaluator
 {
     /// <summary>
-    /// Convert infix expression to postfix expression
+    /// Evaluate infix expression as postfix expression
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    /// <exception cref="ConversionException"></exception>
-    public Expression Convert(Expression expression)
+    /// <exception cref="EvaluationException"></exception>
+    public Expression Evaluate(Expression expression)
     {
         if (expression?.Tokens == null)
         {
-            throw new ConversionException(
-                "Failed to convert expression: the expression was not provided");
+            throw new EvaluationException(
+                "Failed to evaluate expression: the expression was not provided");
         }
 
         if (expression.Type != ExpressionType.Infix)
         {
-            throw new ConversionException(
-                "Failed to convert expression: the expression has incorrect expression type");
+            throw new EvaluationException(
+                "Failed to evaluate expression: the expression has incorrect expression type");
         }
         
         var operatorTokens = new Stack<OperatorToken>();
@@ -53,7 +53,7 @@ public class ConvertInfixToPostfixExpression : IConvertFromExpression
     /// <param name="token"></param>
     /// <param name="operatorTokens"></param>
     /// <param name="result"></param>
-    /// <exception cref="ConversionException"></exception>
+    /// <exception cref="EvaluationException"></exception>
     private void ProcessToken(IToken token, 
         Stack<OperatorToken> operatorTokens, ICollection<IToken> result)
     {
@@ -66,8 +66,8 @@ public class ConvertInfixToPostfixExpression : IConvertFromExpression
                 StoreOperatorToken(operatorToken, operatorTokens, result);
                 break;
             default:
-                throw new ConversionException(
-                    "Failed to convert expression: found unknown token in expression");
+                throw new EvaluationException(
+                    "Failed to evaluate expression: found unknown token in expression");
         }
     }
 

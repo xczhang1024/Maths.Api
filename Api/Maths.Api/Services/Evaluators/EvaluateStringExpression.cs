@@ -4,44 +4,55 @@ using Maths.Api.Exceptions;
 using Maths.Api.Services.Expressions;
 using Maths.Api.Services.Tokens;
 
-namespace Maths.Api.Services.Converters;
+namespace Maths.Api.Services.Evaluators;
 
 /// <summary>
 /// Convert string to infix expression
 /// </summary>
-public class ConvertStringToExpression : IConvertFromString
+public class EvaluateStringExpression : IEvaluator
 {
     /// <summary>
-    /// Convert string to infix expression
+    /// Evaluate string expression to infix expression with tokens
     /// </summary>
-    /// <param name="expressionString"></param>
+    /// <param name="expression"></param>
     /// <returns></returns>
-    public Expression Convert(string expressionString)
+    /// <exception cref="EvaluationException"></exception>
+    public Expression Evaluate(Expression expression)
     {
-        if (string.IsNullOrWhiteSpace(expressionString))
+        if (expression != null 
+            && expression.Tokens.Count != 1
+            && expression.Type != ExpressionType.InfixString)
         {
-            throw new ConversionException(
-                "Failed to convert expression: the input is empty");
+            throw new EvaluationException("Failed to evaluate expression: " +
+                                          "The expression is not a string expression");
         }
 
-        if (expressionString.Length < 3)
+        var stringExpression = expression?.ToString();
+        
+        if (string.IsNullOrWhiteSpace(stringExpression))
         {
-            throw new ConversionException(
-                "Failed to convert expression: the input should be at least 3 characters long");
+            throw new EvaluationException(
+                "Failed to evaluate expression: the input is empty");
+        }
+
+        if (stringExpression.Length < 3)
+        {
+            throw new EvaluationException(
+                "Failed to evaluate expression: the input should be at least 3 characters long");
         }
         
-        if(IsOperator(expressionString.First()) 
-           || IsOperator(expressionString.Last() ) )
+        if(IsOperator(stringExpression.First()) 
+           || IsOperator(stringExpression.Last() ) )
         {
-            throw new ConversionException(
-                "Failed to convert expression: " +
+            throw new EvaluationException(
+                "Failed to evaluate expression: " +
                 "the input should not begin or end with an operator: +-*/");
         }
 
         var tokens = new List<IToken>();
         var numbersBuffer = new StringBuilder();
 
-        foreach (var c in expressionString.Where(c => !char.IsWhiteSpace(c)))
+        foreach (var c in stringExpression.Where(c => !char.IsWhiteSpace(c)))
         {
             if (IsOperator(c))
             {
@@ -56,8 +67,8 @@ public class ConvertStringToExpression : IConvertFromString
                 }
                 else
                 {
-                    throw new ConversionException(
-                        "Failed to convert expression: " +
+                    throw new EvaluationException(
+                        "Failed to evaluate expression: " +
                         "the input should contain only positive numbers and +-*/ characters");
                 }
             }

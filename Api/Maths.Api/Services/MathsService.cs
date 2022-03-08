@@ -1,7 +1,9 @@
 ﻿using Maths.Api.DataAccess;
+using Maths.Api.Enums;
 using Maths.Api.Exceptions;
-using Maths.Api.Services.Converters;
 using Maths.Api.Services.Evaluators;
+using Maths.Api.Services.Expressions;
+using Maths.Api.Services.Tokens;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Maths.Api.Services;
@@ -11,19 +13,15 @@ namespace Maths.Api.Services;
 /// </summary>
 public class MathsService : IMathsService
 {
-    private readonly IConverterRunner _converterRunner;
-
-    private readonly IEvaluator _evaluator;
+    private readonly IEvaluatorRunner _evaluatorRunner;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="converterRunner"></param>
-    /// <param name="evaluator"></param>
-    public MathsService(IConverterRunner converterRunner, IEvaluator evaluator)
+    /// <param name="evaluatorRunner"></param>
+    public MathsService(IEvaluatorRunner evaluatorRunner)
     {
-        _evaluator = evaluator;
-        _converterRunner = converterRunner;
+        _evaluatorRunner = evaluatorRunner;
     }
 
     /// <summary>
@@ -35,15 +33,19 @@ public class MathsService : IMathsService
     {
         try
         {
-            var expression = _converterRunner.RunConverters(expressionDto.Expression);
-            var result = _evaluator.Evaluate(expression);
+            var inputExpression = new Expression(new List<IToken>()
+            {
+                new StringToken(expressionDto.Expression)
+            }, ExpressionType.InfixString);
 
-            return new OkObjectResult(new SuccessDto(result));
+            var resultExpression = _evaluatorRunner.Run(inputExpression);
+
+            return new OkObjectResult(new SuccessDto(
+                double.Parse(resultExpression.ToString())));
         }
         catch (Exception ex)
         {
-            if (ex is ConversionException 
-                or EvaluationException)
+            if (ex is EvaluationException)
             {
                 return new UnprocessableEntityObjectResult(
                     new ErrorDto("Invalid input: " + ex.Message, 

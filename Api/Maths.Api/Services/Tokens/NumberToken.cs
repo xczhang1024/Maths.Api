@@ -26,8 +26,8 @@ public class NumberToken : IToken
             || string.IsNullOrWhiteSpace(value)
             || !double.TryParse(value, out var num))
         {
-            throw new ConversionException(
-                "Failed to convert expression: " +
+            throw new EvaluationException(
+                "Failed to evaluate expression: " +
                 $"{value} : is not a number");
         }
 

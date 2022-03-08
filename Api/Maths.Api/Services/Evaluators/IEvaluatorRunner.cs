@@ -3,14 +3,14 @@
 namespace Maths.Api.Services.Evaluators;
 
 /// <summary>
-/// Interface for evaluating expression
+/// Evaluator runner
 /// </summary>
-public interface IEvaluator
+public interface IEvaluatorRunner
 {
     /// <summary>
-    /// Evaluate expression
+    /// Run all evaluators
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public Expression Evaluate(Expression expression);
+    Expression Run(Expression expression);
 }

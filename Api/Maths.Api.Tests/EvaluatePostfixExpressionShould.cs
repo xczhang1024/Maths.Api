@@ -25,7 +25,7 @@ public class EvaluatePostfixExpressionShould
         var sut = new EvaluatePostfixExpression();
         var result = sut.Evaluate(expression);
         
-        Assert.Equal(correctAnswer, result);
+        Assert.Equal(correctAnswer, double.Parse(result.ToString()));
     }
     
     [Fact]
@@ -45,7 +45,7 @@ public class EvaluatePostfixExpressionShould
         var sut = new EvaluatePostfixExpression();
         var result = sut.Evaluate(expression);
         
-        Assert.Equal(correctAnswer, result);
+        Assert.Equal(correctAnswer, double.Parse(result.ToString()));
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class EvaluatePostfixExpressionShould
         var sut = new EvaluatePostfixExpression();
         var result = sut.Evaluate(expression);
         
-        Assert.Equal(correctAnswer, result);
+        Assert.Equal(correctAnswer, double.Parse(result.ToString()));
     }
 
     [Fact]

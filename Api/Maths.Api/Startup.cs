@@ -1,5 +1,4 @@
 ﻿using Maths.Api.Services;
-using Maths.Api.Services.Converters;
 using Maths.Api.Services.Evaluators;
 
 namespace Maths.Api;
@@ -32,9 +31,17 @@ public class Startup
         
         services.AddSwaggerGen();
 
-        services.AddTransient<IConvertFromString, ConvertStringToExpression>();
-        services.AddTransient<IConvertFromExpression, ConvertInfixToPostfixExpression>();
-        services.AddTransient<IConverterRunner, ConverterRunner>();
+        services.AddSingleton<IEvaluatorRunner>(sp =>
+        {
+            var evaluators = new List<IEvaluator>()
+            {
+                new EvaluateStringExpression(),
+                new EvaluateInfixExpression(),
+                new EvaluatePostfixExpression()
+            };
+
+            return new EvaluatorRunner(evaluators);
+        });
         
         services.AddTransient<IEvaluator, EvaluatePostfixExpression>();
 
