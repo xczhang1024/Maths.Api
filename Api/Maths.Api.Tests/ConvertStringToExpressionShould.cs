@@ -136,4 +136,21 @@ public class ConvertStringToExpressionShould
             "Failed to convert expression: the input is empty", 
             ex.Message);
     }
+
+    [Fact]
+    public void ThrowsConvertToInfixExpressionExceptionWhenStringContainsNegativeNumbers()
+    {
+        var whitespaceExpression = new InputExpressionDto("1 + 2/1.5 * -3.7777");
+        
+        var sut = new ConvertStringToExpression();
+        
+        var ex = Assert
+            .Throws<ConversionException>(()
+                => sut.Convert(whitespaceExpression.Expression));
+        
+        Assert.Equal(
+            "Failed to convert expression: " +
+            "the input should contain only positive numbers and +-*/ characters", 
+            ex.Message);
+    }
 }

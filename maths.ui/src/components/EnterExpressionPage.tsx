@@ -1,14 +1,18 @@
 import { AxiosError, AxiosResponse } from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import ErrorProps from "../props/ErrorProps";
 import Service from "../services/Service";
-import Expression from "../types/Expression";
 import Result from "../types/Result";
 import ErrorComponent from "./ErrorComponent";
+import { HandleForm } from "./HandleForm";
+import ResultComponent from "./ResultComponent";
 
-function ExpressionForm() : JSX.Element {
-    const initialExpressionState = {
+/** This is the main page for the application 
+ * where the user can enter an expression to be evaluated */
+function EnterExpressionPage() : JSX.Element {
+    
+    const initialFormState = {
         expression: ""
     };
 
@@ -16,28 +20,25 @@ function ExpressionForm() : JSX.Element {
         result: 0
     };
 
-    const [expression, setExpression] = useState<Expression>(initialExpressionState);
-    const [error, setError] = useState<ErrorProps>({message: ""});
+    const initalErrorState = {
+        message: ""
+    };
+
+    const [error, setError] = useState<ErrorProps>(initalErrorState);
     const [result, setResult] = useState<Result>(initialResultState);
     const [showResult, setShowResult] = useState<Boolean>(false);
 
-    function onExpressionChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        const expr: Expression = {
-            expression: event.target.value
-        };
-        setExpression(expr);
-    }
+    /** Handle when the form Submit button is clicked
+     *  Send expression to Api and get back the result
+     */
+    const handleSubmit = () => {
+        setError(initalErrorState);
+        setShowResult(false);
 
-    const handleClick = async () => {
-        if(expression.expression.length === 0) {
-            setError({message: "Please provide an expression"});
-            setShowResult(false);
-            return;
-        }
-        
-        setError({message: ""});
+        const map = new Map(Object.entries(values));
+        let exp : string = map.get("expression") as string;
 
-        Service.sendExpression(expression)
+        Service.sendExpression(exp)
             .then((response : AxiosResponse) => {
                 setResult(response.data);
                 setShowResult(true);
@@ -50,20 +51,22 @@ function ExpressionForm() : JSX.Element {
                 else {
                     setError({message: "Failed to evaluate expression."});
                 }
-                
-                setShowResult(false);
             })
             .catch((e : Error) => {
                 setError({message: "Failed to evaluate expression."});
-                setShowResult(false);
             });
     }
+
+    /** Use the HandleForm component to handle form change and submit */
+    const { onChange, onSubmit, values } = HandleForm(
+        handleSubmit,
+        initialFormState
+    );
 
     return (
         <>
             <Container>
-                <h1>Evaluate Expression</h1>
-                <Row>&nbsp;</Row>
+                <h1 >Evaluate an Expression</h1>
 
                 {error.message.length > 0 && 
                     <Container>
@@ -73,33 +76,30 @@ function ExpressionForm() : JSX.Element {
                 }
 
                 <Row>
-                    <Form>
+                    <Form onSubmit={onSubmit}>
                         <Col xs={5}>
                             <Form.Control placeholder="Expression" 
-                                onChange={onExpressionChanged} />
+                                name = "expression"
+                                id = "expression"
+                                required
+                                onChange={onChange} />
                         </Col>
                         <Row>&nbsp;</Row>
                         <Button 
                             className="btn btn-primary btn-large"
-                            onClick={handleClick}>
+                            type="submit">
                             Evaluate
                         </Button>
                     </Form>
                 </Row>
 
-                {showResult && 
-                    <>
-                        <Row>&nbsp;</Row> 
-                        <Row>
-                            <p>The result of evaluation is: </p>
-                            <p>{result.result}</p>
-                        </Row>
-                    </>
-                }
-            </Container>
-            
+                <Container>
+                    <Row>&nbsp;</Row>
+                    {showResult && <ResultComponent result={result.result}/>}
+                </Container>
+            </Container>           
         </>
     )
 }
 
-export default ExpressionForm;
+export default EnterExpressionPage;

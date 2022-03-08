@@ -46,7 +46,7 @@ public class MathsService : IMathsService
                 or EvaluationException)
             {
                 return new UnprocessableEntityObjectResult(
-                    new ErrorDto("The input is invalid. Reason: " + ex.Message, 
+                    new ErrorDto("Invalid input: " + ex.Message, 
                         ex.Message));
             }
             

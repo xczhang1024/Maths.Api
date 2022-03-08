@@ -1,4 +1,5 @@
-export type Result = {
+/** Result from Maths.Api */
+type Result = {
     result : number
 }
 

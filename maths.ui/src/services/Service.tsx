@@ -1,10 +1,16 @@
 import http from "../HttpCommon";
-import Expression from "../types/Expression"
+import ApiInput from "../types/ApiInput"
 
-const sendExpression = ( expression : Expression) => {
-    return http.post("/Maths/Expression/Evaluate", expression)
+/** Send expression to the Api */
+const sendExpression = ( expression : string) => {
+    const apiInput : ApiInput = {
+        expression: expression
+    }
+
+    return http.post("/Maths/expression/evaluate", apiInput)
 }
 
+/** Service for interacting with Maths.Api */
 const Service = {
     sendExpression
 };

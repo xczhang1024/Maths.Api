@@ -34,7 +34,8 @@ public class ConvertStringToExpression : IConvertFromString
            || IsOperator(expressionString.Last() ) )
         {
             throw new ConversionException(
-                "Failed to convert expression: the input should not begin or end with an operator: +-*/");
+                "Failed to convert expression: " +
+                "the input should not begin or end with an operator: +-*/");
         }
 
         var tokens = new List<IToken>();
@@ -57,7 +58,7 @@ public class ConvertStringToExpression : IConvertFromString
                 {
                     throw new ConversionException(
                         "Failed to convert expression: " +
-                        "the input should contain only numbers and +-*/ characters");
+                        "the input should contain only positive numbers and +-*/ characters");
                 }
             }
             else

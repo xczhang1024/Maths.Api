@@ -1,9 +1,8 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import ExpressionForm from './components/ExpressionForm';
+import EnterExpressionPage from './components/EnterExpressionPage';
 
 function App() {
-  return (<ExpressionForm />);
+  return (<EnterExpressionPage />);
 }
 
 export default App;
